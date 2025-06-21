@@ -14,6 +14,8 @@ function App() {
   const [showOnlyBookmarked, setShowOnlyBookmarked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Track which repo cards have animated
+  const [animatedCards, setAnimatedCards] = useState({});
 
   useEffect(() => {
     console.log('Filters changed:', { query, language, sort });
@@ -27,6 +29,7 @@ function App() {
         // Clear bookmarks on change filter
         setBookmarkedRepos([]);
         setShowOnlyBookmarked(false);
+        setAnimatedCards({}); // Reset animation state on filter change
       })
       .catch(err => {
         console.error('Error fetching repos:', err);
@@ -45,6 +48,11 @@ function App() {
         return [...prev, repoId];
       }
     });
+  };
+
+  // Mark a card as animated (called from RepoCard)
+  const handleCardAnimated = (repoId) => {
+    setAnimatedCards(prev => ({ ...prev, [repoId]: true }));
   };
 
   const displayedRepos = showOnlyBookmarked 
@@ -86,6 +94,8 @@ function App() {
             repo={repo} 
             isBookmarked={bookmarkedRepos.includes(repo.id)}
             onBookmarkToggle={() => handleBookmarkToggle(repo.id)}
+            hasAnimated={!!animatedCards[repo.id]}
+            onAnimated={() => handleCardAnimated(repo.id)}
           />
         ))}
       </div>
